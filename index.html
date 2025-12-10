@@ -359,6 +359,13 @@
     </div>
 
     <script>
+        document.addEventListener('keydown', function(e) {
+            // Проверяем, нажата ли одна из стрелок (ArrowUp, ArrowDown, ArrowLeft, ArrowRight)
+            if ([37, 38, 39, 40].includes(e.keyCode)) {
+                e.preventDefault(); // Предотвращаем стандартное действие браузера
+            }
+        });
+        
         // Основные переменные игры
         const canvas = document.getElementById('gameCanvas');
         const ctx = canvas.getContext('2d');
@@ -697,4 +704,5 @@
         });
     </script>
 </body>
+
 </html>
