@@ -1,0 +1,700 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Прядь Ариадны</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            color: #e6e6e6;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 900px;
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 20px;
+        }
+        
+        header {
+            text-align: center;
+            margin-bottom: 10px;
+        }
+        
+        h1 {
+            font-size: 2.8rem;
+            margin-bottom: 5px;
+            background: linear-gradient(90deg, #ff9a00, #ffd166);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+        }
+        
+        .subtitle {
+            font-size: 1.2rem;
+            color: #a0a0c0;
+            margin-bottom: 20px;
+            font-style: italic;
+        }
+        
+        .game-area {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 30px;
+            width: 100%;
+        }
+        
+        .game-container {
+            position: relative;
+            border: 3px solid #3949ab;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+            background-color: #0f3460;
+        }
+        
+        #gameCanvas {
+            display: block;
+            background-color: #0f1b33;
+        }
+        
+        .ui-panel {
+            background: rgba(25, 25, 60, 0.9);
+            border-radius: 10px;
+            padding: 20px;
+            min-width: 250px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.4);
+            border: 1px solid #4a4a8a;
+        }
+        
+        .stats {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            margin-bottom: 25px;
+        }
+        
+        .stat-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-bottom: 8px;
+            border-bottom: 1px solid #3a3a6a;
+        }
+        
+        .stat-label {
+            font-weight: 600;
+            color: #a0a0ff;
+        }
+        
+        .stat-value {
+            font-weight: 700;
+            font-size: 1.4rem;
+            color: #ffd166;
+        }
+        
+        .thread-bar-container {
+            margin: 15px 0;
+        }
+        
+        .thread-label {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 5px;
+        }
+        
+        .thread-bar {
+            height: 20px;
+            background-color: #2a2a4a;
+            border-radius: 10px;
+            overflow: hidden;
+        }
+        
+        .thread-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #4caf50, #8bc34a);
+            border-radius: 10px;
+            transition: width 0.3s;
+            width: 100%;
+        }
+        
+        .danger {
+            background: linear-gradient(90deg, #ff9800, #ff5722);
+        }
+        
+        .critical {
+            background: linear-gradient(90deg, #f44336, #d32f2f);
+            animation: pulse 1s infinite;
+        }
+        
+        @keyframes pulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.8; }
+            100% { opacity: 1; }
+        }
+        
+        .controls {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+        
+        .control-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .key {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 30px;
+            height: 30px;
+            background: #3a3a6a;
+            border-radius: 5px;
+            font-weight: bold;
+            box-shadow: 0 3px 0 #2a2a4a;
+        }
+        
+        .instructions {
+            background: rgba(30, 30, 70, 0.8);
+            border-radius: 8px;
+            padding: 15px;
+            margin-top: 15px;
+            border-left: 4px solid #ff9a00;
+        }
+        
+        .instructions h3 {
+            margin-bottom: 10px;
+            color: #ff9a00;
+        }
+        
+        .instructions ul {
+            padding-left: 20px;
+        }
+        
+        .instructions li {
+            margin-bottom: 8px;
+        }
+        
+        .message {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(0, 0, 0, 0.85);
+            color: white;
+            padding: 25px 40px;
+            border-radius: 10px;
+            text-align: center;
+            z-index: 100;
+            display: none;
+            border: 2px solid #ff9a00;
+            box-shadow: 0 0 30px rgba(255, 154, 0, 0.5);
+        }
+        
+        .message h2 {
+            color: #ffd166;
+            margin-bottom: 15px;
+            font-size: 2rem;
+        }
+        
+        .message p {
+            margin-bottom: 20px;
+            font-size: 1.2rem;
+        }
+        
+        button {
+            background: linear-gradient(135deg, #3949ab, #5c6bc0);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 6px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            box-shadow: 0 4px 0 #283593;
+        }
+        
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 0 #283593;
+            background: linear-gradient(135deg, #5c6bc0, #7986cb);
+        }
+        
+        button:active {
+            transform: translateY(2px);
+            box-shadow: 0 2px 0 #283593;
+        }
+        
+        .level-info {
+            font-size: 1.1rem;
+            color: #a0a0ff;
+            text-align: center;
+            margin-top: 10px;
+        }
+        
+        footer {
+            margin-top: 30px;
+            text-align: center;
+            color: #7a7aaa;
+            font-size: 0.9rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Прядь Ариадны</h1>
+            <div class="subtitle">Лабиринт с ограниченной нитью. Исследуй с умом!</div>
+        </header>
+        
+        <div class="game-area">
+            <div class="game-container">
+                <canvas id="gameCanvas" width="600" height="500"></canvas>
+                <div id="message" class="message">
+                    <h2 id="messageTitle">Победа!</h2>
+                    <p id="messageText">Вы нашли выход из лабиринта!</p>
+                    <button id="restartButton">Новая игра</button>
+                </div>
+            </div>
+            
+            <div class="ui-panel">
+                <div class="stats">
+                    <div class="stat-item">
+                        <span class="stat-label">Уровень:</span>
+                        <span id="level" class="stat-value">1</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-label">Шаги:</span>
+                        <span id="steps" class="stat-value">0</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-label">Осталось нити:</span>
+                        <span id="threadLeft" class="stat-value">100</span>
+                    </div>
+                </div>
+                
+                <div class="thread-bar-container">
+                    <div class="thread-label">
+                        <span>Длина нити:</span>
+                        <span id="threadPercent">100%</span>
+                    </div>
+                    <div class="thread-bar">
+                        <div id="threadFill" class="thread-fill" style="width: 100%"></div>
+                    </div>
+                </div>
+                
+                <div class="controls">
+                    <h3>Управление</h3>
+                    <div class="control-item">
+                        <span class="key">W</span>
+                        <span>или</span>
+                        <span class="key">↑</span>
+                        <span>Движение вверх</span>
+                    </div>
+                    <div class="control-item">
+                        <span class="key">S</span>
+                        <span>или</span>
+                        <span class="key">↓</span>
+                        <span>Движение вниз</span>
+                    </div>
+                    <div class="control-item">
+                        <span class="key">A</span>
+                        <span>или</span>
+                        <span class="key">←</span>
+                        <span>Движение влево</span>
+                    </div>
+                    <div class="control-item">
+                        <span class="key">D</span>
+                        <span>или</span>
+                        <span class="key">→</span>
+                        <span>Движение вправо</span>
+                    </div>
+                    <div class="control-item">
+                        <span class="key">R</span>
+                        <span>Перезапуск уровня</span>
+                    </div>
+                </div>
+                
+                <div class="instructions">
+                    <h3>Как играть</h3>
+                    <ul>
+                        <li>Ваша нить ограничена (100 единиц)</li>
+                        <li>Найдите выход из лабиринта (зелёная дверь)</li>
+                        <li>Возвращайтесь по своим следам, чтобы смотать нить и исследовать новые пути</li>
+                        <li>Если нить закончится, вы застрянете в лабиринте навсегда!</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        
+        <div class="level-info">
+            Лабиринт становится сложнее с каждым уровнем. Сейчас: <span id="mazeSize">10×10</span>
+        </div>
+        
+        <footer>
+            Игра "Прядь Ариадны" | Используйте клавиши WASD или стрелки для движения
+        </footer>
+    </div>
+
+    <script>
+        // Основные переменные игры
+        const canvas = document.getElementById('gameCanvas');
+        const ctx = canvas.getContext('2d');
+        const messageDiv = document.getElementById('message');
+        const messageTitle = document.getElementById('messageTitle');
+        const messageText = document.getElementById('messageText');
+        const restartButton = document.getElementById('restartButton');
+        const levelElement = document.getElementById('level');
+        const stepsElement = document.getElementById('steps');
+        const threadLeftElement = document.getElementById('threadLeft');
+        const threadPercentElement = document.getElementById('threadPercent');
+        const threadFillElement = document.getElementById('threadFill');
+        const mazeSizeElement = document.getElementById('mazeSize');
+        
+        // Параметры игры
+        let gameState = {
+            level: 1,
+            steps: 0,
+            maxThread: 100,
+            threadLeft: 100,
+            cellSize: 30,
+            player: {x: 1, y: 1},
+            exit: {x: 0, y: 0},
+            thread: [{x: 1, y: 1}], // История позиций игрока
+            maze: [],
+            mazeWidth: 10,
+            mazeHeight: 10,
+            gameOver: false,
+            win: false,
+            keys: {}
+        };
+        
+        // Генерация лабиринта с помощью алгоритма DFS
+        function generateMaze(width, height) {
+            // Создаем сетку со стенами
+            const maze = Array(height * 2 + 1).fill().map(() => Array(width * 2 + 1).fill(1));
+            
+            // Рекурсивная функция для создания путей
+            function carve(x, y) {
+                maze[y][x] = 0;
+                
+                // Случайный порядок направлений
+                const directions = [
+                    [0, -2], // Вверх
+                    [2, 0],  // Вправо
+                    [0, 2],  // Вниз
+                    [-2, 0]  // Влево
+                ].sort(() => Math.random() - 0.5);
+                
+                for (const [dx, dy] of directions) {
+                    const nx = x + dx;
+                    const ny = y + dy;
+                    
+                    if (nx > 0 && nx < width * 2 && ny > 0 && ny < height * 2 && maze[ny][nx] === 1) {
+                        // Убираем стену между текущей и следующей клеткой
+                        maze[y + dy / 2][x + dx / 2] = 0;
+                        carve(nx, ny);
+                    }
+                }
+            }
+            
+            // Начинаем с левого верхнего угла
+            carve(1, 1);
+            
+            // Создаем выход в правом нижнем углу
+            maze[height * 2 - 1][width * 2 - 1] = 0;
+            
+            return maze;
+        }
+        
+        // Инициализация новой игры
+        function initGame() {
+            // Увеличиваем сложность с каждым уровнем
+            gameState.mazeWidth = 8 + gameState.level * 2;
+            gameState.mazeHeight = 8 + gameState.level * 2;
+            
+            // Обновляем отображение размера лабиринта
+            mazeSizeElement.textContent = `${gameState.mazeWidth}×${gameState.mazeHeight}`;
+            
+            // Генерируем новый лабиринт
+            gameState.maze = generateMaze(gameState.mazeWidth, gameState.mazeHeight);
+            
+            // Устанавливаем начальную позицию игрока
+            gameState.player = {x: 1, y: 1};
+            
+            // Устанавливаем выход
+            gameState.exit = {
+                x: gameState.maze[0].length - 2,
+                y: gameState.maze.length - 2
+            };
+            
+            // Сбрасываем нить
+            gameState.thread = [{x: gameState.player.x, y: gameState.player.y}];
+            
+            // Сбрасываем параметры игры
+            gameState.steps = 0;
+            gameState.threadLeft = gameState.maxThread;
+            gameState.gameOver = false;
+            gameState.win = false;
+            
+            // Обновляем UI
+            updateUI();
+            
+            // Скрываем сообщение
+            messageDiv.style.display = 'none';
+            
+            // Рисуем начальное состояние
+            draw();
+        }
+        
+        // Обновление интерфейса
+        function updateUI() {
+            levelElement.textContent = gameState.level;
+            stepsElement.textContent = gameState.steps;
+            threadLeftElement.textContent = gameState.threadLeft;
+            
+            const percent = Math.floor((gameState.threadLeft / gameState.maxThread) * 100);
+            threadPercentElement.textContent = `${percent}%`;
+            threadFillElement.style.width = `${percent}%`;
+            
+            // Меняем цвет индикатора в зависимости от количества нити
+            threadFillElement.classList.remove('danger', 'critical');
+            if (percent < 30) {
+                threadFillElement.classList.add('critical');
+            } else if (percent < 60) {
+                threadFillElement.classList.add('danger');
+            }
+        }
+        
+        // Отрисовка игры
+        function draw() {
+            // Очистка холста
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            
+            // Настраиваем размер клетки в зависимости от размера лабиринта
+            const cellSize = Math.min(
+                canvas.width / gameState.maze[0].length,
+                canvas.height / gameState.maze.length
+            );
+            
+            // Отрисовка лабиринта
+            for (let y = 0; y < gameState.maze.length; y++) {
+                for (let x = 0; x < gameState.maze[y].length; x++) {
+                    ctx.fillStyle = gameState.maze[y][x] === 1 ? '#1c2b5c' : '#0f1b33';
+                    ctx.fillRect(x * cellSize, y * cellSize, cellSize, cellSize);
+                    
+                    // Рисуем стены
+                    if (gameState.maze[y][x] === 1) {
+                        ctx.strokeStyle = '#283593';
+                        ctx.lineWidth = 1;
+                        ctx.strokeRect(x * cellSize, y * cellSize, cellSize, cellSize);
+                    }
+                }
+            }
+            
+            // Отрисовка нити Ариадны
+            ctx.strokeStyle = '#ff9a00';
+            ctx.lineWidth = 3;
+            ctx.lineJoin = 'round';
+            ctx.lineCap = 'round';
+            ctx.beginPath();
+            
+            for (let i = 0; i < gameState.thread.length; i++) {
+                const pos = gameState.thread[i];
+                const x = pos.x * cellSize + cellSize / 2;
+                const y = pos.y * cellSize + cellSize / 2;
+                
+                if (i === 0) {
+                    ctx.moveTo(x, y);
+                } else {
+                    ctx.lineTo(x, y);
+                }
+            }
+            
+            ctx.stroke();
+            
+            // Отрисовка игрока
+            ctx.fillStyle = '#4fc3f7';
+            ctx.beginPath();
+            ctx.arc(
+                gameState.player.x * cellSize + cellSize / 2,
+                gameState.player.y * cellSize + cellSize / 2,
+                cellSize / 3,
+                0,
+                Math.PI * 2
+            );
+            ctx.fill();
+            ctx.strokeStyle = '#0277bd';
+            ctx.lineWidth = 2;
+            ctx.stroke();
+            
+            // Отрисовка выхода
+            ctx.fillStyle = '#4caf50';
+            ctx.fillRect(
+                gameState.exit.x * cellSize + 2,
+                gameState.exit.y * cellSize + 2,
+                cellSize - 4,
+                cellSize - 4
+            );
+            
+            // Рисуем значок двери на выходе
+            ctx.fillStyle = '#2e7d32';
+            ctx.fillRect(
+                gameState.exit.x * cellSize + cellSize / 2 - 5,
+                gameState.exit.y * cellSize + 5,
+                10,
+                cellSize - 10
+            );
+            
+            // Рисуем ручку
+            ctx.fillStyle = '#ffd54f';
+            ctx.beginPath();
+            ctx.arc(
+                gameState.exit.x * cellSize + cellSize / 2 + 3,
+                gameState.exit.y * cellSize + cellSize / 2,
+                3,
+                0,
+                Math.PI * 2
+            );
+            ctx.fill();
+        }
+        
+        // Проверка движения игрока
+        function movePlayer(dx, dy) {
+            if (gameState.gameOver || gameState.win) return;
+            
+            const newX = gameState.player.x + dx;
+            const newY = gameState.player.y + dy;
+            
+            // Проверяем, не выходит ли игрок за границы лабиринта
+            if (
+                newX < 0 || newY < 0 ||
+                newY >= gameState.maze.length || newX >= gameState.maze[0].length
+            ) {
+                return;
+            }
+            
+            // Проверяем, не является ли клетка стеной
+            if (gameState.maze[newY][newX] === 1) {
+                return;
+            }
+            
+            // Увеличиваем счетчик шагов
+            gameState.steps++;
+            
+            // Проверяем, не возвращается ли игрок по своей нити
+            const threadIndex = gameState.thread.findIndex(pos => pos.x === newX && pos.y === newY);
+            
+            if (threadIndex !== -1) {
+                // Игрок возвращается по нити - сматываем её
+                gameState.thread = gameState.thread.slice(0, threadIndex + 1);
+                
+                // Возвращаем часть нити (но не больше максимального значения)
+                const returnedThread = gameState.thread.length - (threadIndex + 1);
+                gameState.threadLeft = Math.min(gameState.maxThread, gameState.threadLeft + returnedThread);
+            } else {
+                // Игрок движется в новую клетку - разматываем нить
+                gameState.thread.push({x: newX, y: newY});
+                gameState.threadLeft--;
+                
+                // Проверяем, не закончилась ли нить
+                if (gameState.threadLeft < 0) {
+                    gameOver();
+                    return;
+                }
+            }
+            
+            // Обновляем позицию игрока
+            gameState.player.x = newX;
+            gameState.player.y = newY;
+            
+            // Проверяем, не достиг ли игрок выхода
+            if (gameState.player.x === gameState.exit.x && gameState.player.y === gameState.exit.y) {
+                win();
+            }
+            
+            // Обновляем интерфейс и перерисовываем
+            updateUI();
+            draw();
+        }
+        
+        // Окончание игры (поражение)
+        function gameOver() {
+            gameState.gameOver = true;
+            messageTitle.textContent = "Нить оборвалась!";
+            messageText.textContent = `Вы застряли в лабиринте на уровне ${gameState.level}. Попробуйте снова!`;
+            messageDiv.style.display = 'block';
+        }
+        
+        // Победа в уровне
+        function win() {
+            gameState.win = true;
+            messageTitle.textContent = "Уровень пройден!";
+            messageText.textContent = `Вы нашли выход из лабиринта за ${gameState.steps} шагов!`;
+            messageDiv.style.display = 'block';
+            
+            // Увеличиваем уровень для следующей игры
+            gameState.level++;
+        }
+        
+        // Обработка нажатий клавиш
+        document.addEventListener('keydown', (e) => {
+            gameState.keys[e.key.toLowerCase()] = true;
+            
+            // Обработка движения
+            if (e.key === 'w' || e.key === 'ArrowUp') {
+                movePlayer(0, -1);
+            } else if (e.key === 's' || e.key === 'ArrowDown') {
+                movePlayer(0, 1);
+            } else if (e.key === 'a' || e.key === 'ArrowLeft') {
+                movePlayer(-1, 0);
+            } else if (e.key === 'd' || e.key === 'ArrowRight') {
+                movePlayer(1, 0);
+            } else if (e.key === 'r') {
+                // Перезапуск уровня
+                initGame();
+            }
+        });
+        
+        document.addEventListener('keyup', (e) => {
+            gameState.keys[e.key.toLowerCase()] = false;
+        });
+        
+        // Обработка кнопки рестарта
+        restartButton.addEventListener('click', () => {
+            initGame();
+        });
+        
+        // Запуск игры при загрузке страницы
+        window.addEventListener('load', () => {
+            initGame();
+            
+            // Фокус на холсте для обработки клавиш
+            canvas.focus();
+            canvas.setAttribute('tabindex', '0');
+        });
+    </script>
+</body>
+</html>
