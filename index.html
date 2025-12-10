@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" href="art.png" type="image/png">
+    <link rel="stylesheet" href="style.css">
+    <title>Прядь Ариадны</title>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Прядь Ариадны</h1>
+            <div class="subtitle">Лабиринт с ограниченной нитью. Исследуй с умом!</div>
+        </header>
+        
+        <div class="game-area">
+            <div class="game-container">
+                <canvas id="gameCanvas" width="600" height="500"></canvas>
+                <div id="message" class="message">
+                    <h2 id="messageTitle">Победа!</h2>
+                    <p id="messageText">Вы нашли выход из лабиринта!</p>
+                    <button id="restartButton">Новая игра</button>
+                </div>
+            </div>
+            
+            <div class="ui-panel">
+                <div class="stats">
+                    <div class="stat-item">
+                        <span class="stat-label">Уровень:</span>
+                        <span id="level" class="stat-value">1</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-label">Шаги:</span>
+                        <span id="steps" class="stat-value">0</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-label">Осталось нити:</span>
+                        <span id="threadLeft" class="stat-value">100</span>
+                    </div>
+                </div>
+                
+                <div class="thread-bar-container">
+                    <div class="thread-label">
+                        <span>Длина нити:</span>
+                        <span id="threadPercent">100%</span>
+                    </div>
+                    <div class="thread-bar">
+                        <div id="threadFill" class="thread-fill" style="width: 100%"></div>
+                    </div>
+                </div>
+                
+                <div class="controls">
+                    <h3>Управление</h3>
+                    <div class="control-item">
+                        <span class="key">W</span>
+                        <span>или</span>
+                        <span class="key">↑</span>
+                        <span>Движение вверх</span>
+                    </div>
+                    <div class="control-item">
+                        <span class="key">S</span>
+                        <span>или</span>
+                        <span class="key">↓</span>
+                        <span>Движение вниз</span>
+                    </div>
+                    <div class="control-item">
+                        <span class="key">A</span>
+                        <span>или</span>
+                        <span class="key">←</span>
+                        <span>Движение влево</span>
+                    </div>
+                    <div class="control-item">
+                        <span class="key">D</span>
+                        <span>или</span>
+                        <span class="key">→</span>
+                        <span>Движение вправо</span>
+                    </div>
+                    <div class="control-item">
+                        <span class="key">R</span>
+                        <span>Перезапуск уровня</span>
+                    </div>
+                </div>
+                
+                <div class="instructions">
+                    <h3>Как играть</h3>
+                    <ul>
+                        <li>Ваша нить ограничена (100 единиц)</li>
+                        <li>Найдите выход из лабиринта (зелёная дверь)</li>
+                        <li>Возвращайтесь по своим следам, чтобы смотать нить и исследовать новые пути</li>
+                        <li>Если нить закончится, вы застрянете в лабиринте навсегда!</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        
+        <div class="level-info">
+            Лабиринт становится сложнее с каждым уровнем. Сейчас: <span id="mazeSize">10×10</span>
+        </div>
+        
+        <footer>
+            Игра "Прядь Ариадны" | Используйте клавиши WASD или стрелки для движения
+        </footer>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
